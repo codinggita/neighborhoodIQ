@@ -10,6 +10,7 @@ import Compare from './pages/Compare';
 import Search from './pages/Search';
 import Profile from './pages/Profile';
 import PlaceDetails from './pages/PlaceDetails';
+import Support from './pages/Support';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import { AuthProvider } from './context/AuthContext';
@@ -41,6 +42,8 @@ function AppContent() {
           <Route path="/search/Bangalore" element={<Search />} />
           
           <Route path="/about" element={<About />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/contact" element={<Support />} />
           
           <Route path="/profile" element={<Profile />} />
           <Route path="/profile/Saved%20Neighborhoods" element={<Profile />} />

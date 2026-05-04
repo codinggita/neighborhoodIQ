@@ -60,6 +60,7 @@ const Footer = () => {
               <li><Link to="/compare" className="hover:text-brand-400 transition-colors">Comparison Tool</Link></li>
               <li><Link to="/login" className="hover:text-brand-400 transition-colors">Sign In</Link></li>
               <li><Link to="/register" className="hover:text-brand-400 transition-colors">Create Account</Link></li>
+              <li><Link to="/support" className="hover:text-brand-400 transition-colors">Contact Support</Link></li>
             </ul>
           </FooterSection>
 

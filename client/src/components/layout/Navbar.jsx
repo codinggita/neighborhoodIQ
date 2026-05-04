@@ -40,6 +40,7 @@ const Navbar = () => {
     { name: 'Explore', path: '/explore' },
     { name: 'Compare', path: '/compare' },
     { name: 'About', path: '/about' },
+    { name: 'Support', path: '/support' },
   ];
 
   const isActive = (path) => {
@@ -47,7 +48,7 @@ const Navbar = () => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
-  const isTransparentPage = location.pathname === '/explore'; // Home is now /
+  const isTransparentPage = location.pathname === '/explore' || location.pathname === '/' || location.pathname === '/contact'; // Home is now /
   const isTransparent = !isScrolled && isTransparentPage;
 
   return (
