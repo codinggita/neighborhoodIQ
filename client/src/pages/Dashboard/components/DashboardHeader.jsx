@@ -23,6 +23,7 @@ const DashboardHeader = () => {
     { name: 'Explore', path: '/explore' },
     { name: 'Compare', path: '/compare' },
     { name: 'About', path: '/about' },
+    { name: 'Support', path: '/support' },
   ];
 
   const isActive = (path) => {
