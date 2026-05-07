@@ -13,6 +13,11 @@ const searchAreas = asyncHandler(async (req, res) => {
   res.send({ results: areas, page, limit, totalResults: areas.length });
 });
 
+const getAreas = asyncHandler(async (req, res) => {
+  const areas = await areaService.queryAreas({}, {});
+  res.send(areas);
+});
+
 const getAreaById = asyncHandler(async (req, res) => {
   const area = await areaService.getAreaById(req.params.id);
   if (!area) {
@@ -52,6 +57,7 @@ const compareAreas = asyncHandler(async (req, res) => {
 
 module.exports = {
   searchAreas,
+  getAreas,
   getAreaById,
   compareAreas,
 };
