@@ -36,17 +36,27 @@ const MapController = ({ onMapReady }) => {
   return null;
 };
 
+// Helper to get color based on score
+const getScoreColor = (score) => {
+  if (score >= 90) return '#0F2F20'; // Excellent - Deep Green
+  if (score >= 75) return '#11B573'; // Very Good - Emerald
+  if (score >= 60) return '#fbbf24'; // Good - Amber
+  if (score >= 40) return '#f97316'; // Average - Orange
+  return '#ef4444'; // Below Average - Red
+};
+
 // Create custom div icon for neighborhood scores
 const createCustomIcon = (score, name) => {
+  const color = getScoreColor(score);
   return L.divIcon({
     className: 'custom-score-marker',
     html: `
       <div style="position: absolute; left: 0; top: 0;">
         <div style="position: absolute; left: 0; top: 0; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; cursor: pointer; padding-bottom: 2px;">
-          <div style="width: 34px; height: 34px; background: #0F2F20; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid white; position: relative; z-index: 10;">
+          <div style="width: 34px; height: 34px; background: ${color}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid white; position: relative; z-index: 10;">
             ${score}
           </div>
-          <div style="width: 10px; height: 10px; background: #0F2F20; transform: rotate(45deg); margin-top: -6px; z-index: 0;"></div>
+          <div style="width: 10px; height: 10px; background: ${color}; transform: rotate(45deg); margin-top: -6px; z-index: 0;"></div>
         </div>
         <div style="position: absolute; left: 0; top: 4px; transform: translateX(-50%); padding: 2px 10px; background: white; border-radius: 20px; font-size: 11px; font-weight: 700; color: #1e293b; box-shadow: 0 2px 8px rgba(0,0,0,0.12); border: 1px solid #f1f5f9; white-space: nowrap; text-align: center;">
           ${name}
@@ -90,14 +100,14 @@ const MapNeighborhoodCard = ({ neighborhood, isActive }) => {
         <h4 className="font-bold text-slate-900 text-[17px] leading-tight mb-0.5">{neighborhood.name}</h4>
         <p className="text-slate-500 text-xs">{neighborhood.location.split(',')[0]}</p>
       </div>
-      <div className="ml-4 w-10 h-10 rounded-full bg-[#0F2F20] flex items-center justify-center shrink-0">
+      <div className="ml-4 w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: getScoreColor(neighborhood.score) }}>
         <span className="text-white font-bold text-sm">{neighborhood.score}</span>
       </div>
     </div>
   );
 };
 
-const ExploreMap = ({ neighborhoods }) => {
+const ExploreMap = ({ neighborhoods, focusLocation }) => {
   const mapCenter = [19.0760, 72.8777];
   const [mapInstance, setMapInstance] = React.useState(null);
   const [userMarkers, setUserMarkers] = React.useState([]);
@@ -105,6 +115,16 @@ const ExploreMap = ({ neighborhoods }) => {
   const handleMapReady = React.useCallback((map) => {
     setMapInstance(map);
   }, []);
+
+  // Fly to focusLocation when it changes
+  React.useEffect(() => {
+    if (mapInstance && focusLocation) {
+      mapInstance.flyTo([focusLocation.lat, focusLocation.lng], focusLocation.zoom || 14, {
+        duration: 2,
+        easeLinearity: 0.25
+      });
+    }
+  }, [mapInstance, focusLocation]);
 
   const handleZoomIn = () => {
     if (mapInstance) mapInstance.zoomIn();
