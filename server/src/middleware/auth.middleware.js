@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const httpStatus = require('http-status');
-const config = require('../config/env');
 const User = require('../models/User.model');
 const ApiError = require('../utils/ApiError');
 
@@ -12,7 +11,7 @@ const auth = (requiredRole) => async (req, res, next) => {
 
   const token = authHeader.split(' ')[1];
   try {
-    const payload = jwt.verify(token, config.jwt.secret);
+    const payload = jwt.verify(token, process.env.JWT_SECRET || 'secret');
     const user = await User.findById(payload.sub);
 
     if (!user) {
