@@ -1,8 +1,8 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, PieChart, List } from 'lucide-react';
+import SearchBar from '../../components/search/SearchBar';
 
-const ExploreHero = () => {
+const ExploreHero = ({ onSearchSelect }) => {
   return (
     <section className="relative min-h-[600px] flex items-center pt-28 pb-16 lg:py-0 lg:pt-24 overflow-hidden bg-slate-950">
       {/* Background Image */}
@@ -36,6 +36,10 @@ const ExploreHero = () => {
               Access standardized, data-driven insights on 19,000+ neighborhoods across India. 
               Compare, analyze, and choose the right location for your home or next investment.
             </p>
+
+            <div className="mt-10 mb-6">
+              <SearchBar onSelect={onSearchSelect} />
+            </div>
           </motion.div>
         </div>
 
