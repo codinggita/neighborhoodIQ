@@ -44,6 +44,80 @@ const getStats = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get analytics data
+ */
+const getAnalytics = asyncHandler(async (req, res) => {
+  // Mocking search data for now
+  const searchStats = {
+    totalSearches: 4520,
+    topCities: [
+      { city: 'Mumbai', count: 1240 },
+      { city: 'Bengaluru', count: 980 },
+      { city: 'Delhi', count: 750 },
+      { city: 'Hyderabad', count: 620 },
+      { city: 'Pune', count: 480 },
+    ],
+    popularNeighborhoods: [
+      { name: 'Koramangala', saves: 85 },
+      { name: 'Powai', saves: 72 },
+      { name: 'Indiranagar', saves: 64 },
+      { name: 'Bandra West', saves: 58 },
+    ]
+  };
+
+  const usageTrend = [
+    { date: '2026-05-01', users: 120 },
+    { date: '2026-05-02', users: 145 },
+    { date: '2026-05-03', users: 132 },
+    { date: '2026-05-04', users: 168 },
+    { date: '2026-05-05', users: 190 },
+    { date: '2026-05-06', users: 210 },
+    { date: '2026-05-07', users: 245 },
+  ];
+
+  res.send({
+    searchStats,
+    usageTrend
+  });
+});
+
+/**
+ * Get all users for admin management
+ */
+const getUsersAdmin = asyncHandler(async (req, res) => {
+  const users = await User.find().select('-password').sort({ createdAt: -1 });
+  res.send(users);
+});
+
+/**
+ * Update user role or status
+ */
+const updateUserAdmin = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.userId);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  }
+
+  if (user._id.toString() === req.user.id.toString() && req.body.role === 'user') {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot demote yourself');
+  }
+
+  const before = user.toObject();
+  Object.assign(user, req.body);
+  await user.save();
+
+  await AuditLog.create({
+    admin: req.user.id,
+    action: 'UPDATE_USER',
+    targetType: 'User',
+    targetId: user._id,
+    details: { before, after: user.toObject() }
+  });
+
+  res.send(user);
+});
+
+/**
  * Get all areas for admin management
  */
 const getAreasAdmin = asyncHandler(async (req, res) => {
@@ -111,6 +185,9 @@ const deleteArea = asyncHandler(async (req, res) => {
 
 module.exports = {
   getStats,
+  getAnalytics,
+  getUsersAdmin,
+  updateUserAdmin,
   getAreasAdmin,
   updateArea,
   getRecentReviews,
