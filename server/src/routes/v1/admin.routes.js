@@ -11,7 +11,9 @@ router.use(adminOnly);
 router.get('/stats', adminController.getStats);
 router.get('/areas', adminController.getAreasAdmin);
 router.get('/users', adminController.getUsersAdmin);
+router.get('/analytics', adminController.getAnalytics);
 router.get('/reviews', adminController.getRecentReviews);
+router.post('/refresh', adminController.triggerSync);
 
 router.patch('/areas/:areaId', adminController.updateArea);
 router.patch('/users/:userId', adminController.updateUserAdmin);

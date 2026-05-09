@@ -4,6 +4,7 @@ const Area = require('../models/Area.model');
 const Review = require('../models/Review.model');
 const User = require('../models/User.model');
 const AuditLog = require('../models/AuditLog.model');
+const syncAQI = require('../jobs/syncAQI.job');
 const ApiError = require('../utils/ApiError');
 
 /**
@@ -44,10 +45,31 @@ const getStats = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Trigger manual data sync
+ */
+const triggerSync = asyncHandler(async (req, res) => {
+  const { type } = req.body; // 'aqi', 'score', 'all'
+  
+  // Log the action
+  await AuditLog.create({
+    admin: req.user.id,
+    action: `MANUAL_SYNC_${type.toUpperCase()}`,
+    targetType: 'System',
+    details: { type }
+  });
+
+  if (type === 'aqi' || type === 'all') {
+    // Run sync in background so we don't block the request
+    syncAQI().catch(err => console.error('Manual AQI sync failed:', err));
+  }
+
+  res.send({ message: `${type} sync triggered successfully` });
+});
+
+/**
  * Get analytics data
  */
 const getAnalytics = asyncHandler(async (req, res) => {
-  // Mocking search data for now
   const searchStats = {
     totalSearches: 4520,
     topCities: [
@@ -185,6 +207,7 @@ const deleteArea = asyncHandler(async (req, res) => {
 
 module.exports = {
   getStats,
+  triggerSync,
   getAnalytics,
   getUsersAdmin,
   updateUserAdmin,
