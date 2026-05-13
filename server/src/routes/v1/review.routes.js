@@ -1,9 +1,10 @@
 const express = require('express');
+const auth = require('../../middleware/auth.middleware');
+const reviewController = require('../../controllers/review.controller');
+
 const router = express.Router();
 
-// Placeholder for review routes
-router.get('/', (req, res) => {
-  res.send({ message: 'Review routes coming soon' });
-});
+router.get('/:areaId', reviewController.getAreaReviews);
+router.post('/:areaId', auth(), reviewController.createReview);
 
 module.exports = router;
