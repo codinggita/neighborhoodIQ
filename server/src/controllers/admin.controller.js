@@ -45,12 +45,22 @@ const getStats = asyncHandler(async (req, res) => {
 });
 
 /**
+ * Get all audit logs
+ */
+const getAuditLogs = asyncHandler(async (req, res) => {
+  const logs = await AuditLog.find()
+    .sort({ createdAt: -1 })
+    .limit(100)
+    .populate('admin', 'name email');
+  res.send(logs);
+});
+
+/**
  * Trigger manual data sync
  */
 const triggerSync = asyncHandler(async (req, res) => {
-  const { type } = req.body; // 'aqi', 'score', 'all'
+  const { type } = req.body; 
   
-  // Log the action
   await AuditLog.create({
     admin: req.user.id,
     action: `MANUAL_SYNC_${type.toUpperCase()}`,
@@ -59,7 +69,6 @@ const triggerSync = asyncHandler(async (req, res) => {
   });
 
   if (type === 'aqi' || type === 'all') {
-    // Run sync in background so we don't block the request
     syncAQI().catch(err => console.error('Manual AQI sync failed:', err));
   }
 
@@ -205,8 +214,33 @@ const deleteArea = asyncHandler(async (req, res) => {
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+/**
+ * Update review status (approve/reject/spam)
+ */
+const updateReviewStatus = asyncHandler(async (req, res) => {
+  const review = await Review.findById(req.params.reviewId);
+  if (!review) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Review not found');
+  }
+
+  const before = review.status;
+  review.status = req.body.status;
+  await review.save();
+
+  await AuditLog.create({
+    admin: req.user.id,
+    action: 'UPDATE_REVIEW_STATUS',
+    targetType: 'Review',
+    targetId: review._id,
+    details: { before, after: review.status }
+  });
+
+  res.send(review);
+});
+
 module.exports = {
   getStats,
+  getAuditLogs,
   triggerSync,
   getAnalytics,
   getUsersAdmin,
@@ -215,4 +249,5 @@ module.exports = {
   updateArea,
   getRecentReviews,
   deleteArea,
+  updateReviewStatus,
 };
