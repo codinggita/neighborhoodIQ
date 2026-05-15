@@ -35,8 +35,15 @@ const userSchema = mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'admin', 'moderator'],
       default: 'user',
+    },
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+    lastLogin: {
+      type: Date,
     },
     isEmailVerified: {
       type: Boolean,
