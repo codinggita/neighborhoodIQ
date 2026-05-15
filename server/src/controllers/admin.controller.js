@@ -129,12 +129,19 @@ const updateUserAdmin = asyncHandler(async (req, res) => {
     throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
   }
 
+  // Prevent self-demotion
   if (user._id.toString() === req.user.id.toString() && req.body.role === 'user') {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Cannot demote yourself');
   }
 
   const before = user.toObject();
-  Object.assign(user, req.body);
+  
+  // Whitelist updateable fields
+  const updates = {};
+  if (req.body.role) updates.role = req.body.role;
+  if (typeof req.body.isBlocked !== 'undefined') updates.isBlocked = req.body.isBlocked;
+  
+  Object.assign(user, updates);
   await user.save();
 
   await AuditLog.create({
@@ -166,7 +173,15 @@ const updateArea = asyncHandler(async (req, res) => {
   }
 
   const before = area.toObject();
-  Object.assign(area, req.body);
+  
+  // Whitelist updateable fields for Area
+  const allowedFields = ['name', 'status', 'tags', 'city', 'state', 'score'];
+  allowedFields.forEach(field => {
+    if (typeof req.body[field] !== 'undefined') {
+      area[field] = req.body[field];
+    }
+  });
+
   await area.save();
 
   await AuditLog.create({
