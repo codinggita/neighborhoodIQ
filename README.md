@@ -34,6 +34,8 @@
 
 ---
 
+
+
 ## 🎯 Overview
 
 **NeighborhoodIQ** transforms fragmented neighborhood data into actionable insights. Homebuyers, real estate investors, and urban planners can now make data-driven decisions by evaluating neighborhoods through a standardized, transparent scoring system.
